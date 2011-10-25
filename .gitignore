@@ -1,4 +1,4 @@
 *.o
-debugbreak
+fib
 core
 core.*

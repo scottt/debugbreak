@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <signal.h>
+#ifndef DEBUG_BREAK_H
 
+#include <signal.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 
@@ -32,7 +32,6 @@ static void trap_instruction(void)
 	asm(".inst\t0xe7ffffff");
 }
 #else
-#error "debug_break: else"
 enum { HAVE_TRAP_INSTRUCTION = 0, };
 #endif
 
@@ -51,20 +50,4 @@ static void debug_break(void)
 	}
 }
 
-int fib(int n)
-{
-	int r;
-	if (n == 0 || n == 1)
-		return 1;
-	r = fib(n-1) + fib(n-2);
-	if (r == 89) {
-		debug_break();
-	}
-	return r;
-}
-
-int main()
-{
-	printf("%d\n", fib(15));
-	return 0;
-}
+#endif
