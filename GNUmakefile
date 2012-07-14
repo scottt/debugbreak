@@ -1,13 +1,11 @@
 CFLAGS := -Os -Wall -g
 CXXFLAGS := $(CFLAGS)
 
-PROGRAMS := $(subst .c,,$(wildcard *.c)) $(subst .cc,,$(wildcard *.cc))
+PROGRAMS := $(basename $(wildcard *.c test/*.c))
 
 .PHONY: all clean
 all: $(PROGRAMS)
-thread-cancellation: LDFLAGS += -lpthread
-c++-thread-cancellation: LDFLAGS += -lpthread
-t: LDFLAGS += -lpthread
-t0: LDFLAGS += -lpthread
 clean:
-	rm -f $(PROGRAMS)
+	rm -f $(PROGRAMS) cscope.out tags
+
+test/%: CFLAGS +=-I.

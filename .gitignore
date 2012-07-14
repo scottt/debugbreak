@@ -2,3 +2,6 @@
 fib
 core
 core.*
+cscope.out
+tags
+.gdb_history
