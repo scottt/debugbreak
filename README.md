@@ -1,4 +1,4 @@
-"debugbreak.h" allows you to put breakpoints in your sourcde code with:
+["debugbreak.h"](https://github.com/scottt/debugbreak/blob/master/debugbreak.h) allows you to put breakpoints in your sourcde code with:
 ```C
 #include <stdio.h>
 #include "debugbreak.h"
@@ -10,7 +10,7 @@ int main()
 	return 0;
 }
 ```
-Much like the DebugBreak() intrinsic provided by Windows and QNX headers.
+like the DebugBreak() intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey(v=VS.100).aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html) headers.
 
 Note that gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) is unsatisfactory because "continue" in gdb
 doesn't work even if you do:
