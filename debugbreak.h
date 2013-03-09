@@ -1,4 +1,5 @@
 #ifndef DEBUG_BREAK_H
+#define DEBUG_BREAK_H
 
 #include <signal.h>
 #include <unistd.h>
