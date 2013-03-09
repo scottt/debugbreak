@@ -10,26 +10,44 @@ int main()
 	return 0;
 }
 ```
-like the DebugBreak() intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html) headers.
+like the DebugBreak() intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
 
-Note that gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) is unsatisfactory because "continue" in gdb
-doesn't work even if you do:
+Note that gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) is unsatisfactory because once it hit a breakpoint caused by it you can't "continue" in gdb. Even if you setup gdb with:
 ```
 	(gdb) handle SIGILL stop nopass
-	(gdb) file TEST-PROGRAM
-	(gdb) run
-	# breakpoint hit
-	(gdb) continue
 ```
-while it works with debug_break(). __builtin_trap() apparently also marks the instruction after it as unreachable and may cause the compiler optimizers to remove them so is not suitable for placing break points in source code.
+"continue" still doesn't work reliably with __builtin_trap() while they work with debug_break(). __builtin_trap() also apparently marks the instructions after it as unreachable and thus may cause the compiler to optimize them away.
 
 NOTES
 ================================
 
 gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) generates an "ud2" instruction on i386 / x86-64:
 ```
+trap.c
+   #include <stdio.h>
+   
+   int main()
+   {
+   	__builtin_trap();
+   	printf("hello world\n");
+   	return 0;
+   }
+   
+   
 $ gdbdis test/trap main
    0x0000000000400390 <+0>:	0f 0b	ud2    
+
+break.c
+   #include <stdio.h>
+   #include "debugbreak.h"
+   
+   int main()
+   {
+   	debug_break();
+   	printf("hello world\n");
+   	return 0;
+   }
+
 $ gdbdis test/break main
    0x00000000004003d0 <+0>:	50	push   %rax
    0x00000000004003d1 <+1>:	cc	int3   
