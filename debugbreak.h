@@ -27,15 +27,30 @@ enum { HAVE_TRAP_INSTRUCTION = 1, };
 __attribute__((gnu_inline, always_inline))
 static void __inline__ trap_instruction(void)
 {
-	__asm__ volatile(".inst\t0xdeff");
+	/* See 'arm-linux-tdep.c' in the GDB source.
+	 * Instruction used here is called 'eabi_linux_thumb_le_breakpoint' there.
+	 */
+	__asm__ volatile(".inst 0xde01");
 }
 #elif defined(__arm__) && !defined(__thumb__)
 enum { HAVE_TRAP_INSTRUCTION = 1, };
-#warning "debug_break: __arm__: untested"
 __attribute__((gnu_inline, always_inline))
 static void __inline__ trap_instruction(void)
 {
-	__asm__ volatile(".inst\t0xe7ffffff");
+	/* See 'arm-linux-tdep.c' in the GDB source.
+	 * Instruction used here is called 'eabi_linux_arm_le_breakpoint' there.
+	 *
+	 * Known problem:
+	 * After a breakpoint hit, can't stepi, step, or continue in GDB.
+	 * 'step' stuck on the same instruction.
+	 *
+	 * Workaround: jump over the 4 byte instruction
+	 * (gdb) tbreak *($pc + 4)
+	 * (gdb) jump   *($pc + 4)
+	 *
+	 * debugbreak-gdb.py adds a 'debugbreak-stepi' command in GDB for this.
+	 */
+	__asm__ volatile(".inst 0xe7f001f0");
 }
 #else
 enum { HAVE_TRAP_INSTRUCTION = 0, };
