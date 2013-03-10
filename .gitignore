@@ -7,3 +7,4 @@ tags
 .gdb_history
 test/trap
 test/break
+test/break-c++

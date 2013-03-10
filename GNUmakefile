@@ -11,4 +11,4 @@ clean:
 %: %.S
 	$(CC) $(CFLAGS) -nostdlib $< -o $@
 
-test/%: CFLAGS +=-I.
+test/%: CPPFLAGS +=-I.
