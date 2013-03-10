@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
 	DEBUG_BREAK_PREFER_BUILTIN_TRAP_TO_SIGTRAP = 1,
 };
@@ -51,5 +55,9 @@ static void __inline__ debug_break(void)
 		raise(SIGTRAP);
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
