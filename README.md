@@ -12,6 +12,10 @@ int main()
 ```
 this works like the **DebugBreak()** intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
 
+License
+================================
+2-Clause BSD. See [COPYING](https://github.com/scottt/debugbreak/blob/master/COPYING).
+
 Notes
 ================================
 
