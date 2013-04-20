@@ -20,14 +20,14 @@ Notes
 ================================
 
 The requirements for the **debug_break()** function are:
-* Act as an compiler code motion barrier
-* Doesn't cause the compiler to think the code following it can't be reached
-* Trigger a software breakpoint hit event when executed (i.e. causes **SIGTRAP** on Linux)
+* Act as a compiler code motion barrier
+* Don't cause the compiler to think the code following it is dead
+* Trigger a software breakpoint hit when executed (i.e. **SIGTRAP** on Linux)
 * After a breakpoint hit, support using **continue**, **next**, **step**, **stepi** etc commands in GDB to continue execution.
 
-Ideally, both gcc and Clang would provide a **__builtin_debugger()** builtin function for all supported architectures that satisfies the above.
+Ideally, both gcc and Clang would provide a **__builtin_debugger()** that satisfies the above on all supported architectures and operating systems.
 Unfortunately, we're not there yet.
-gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizer to think the code follwing it  can't be reached.
+gcc's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizer to think the code follwing it is dead and can be removed.
 [test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c):
 ```C
 #include <stdio.h>
@@ -48,7 +48,7 @@ This makes it necessary to change GDB's default behavior on SIGILL to not termin
 ```
 	(gdb) handle SIGILL stop nopass
 ```
-Even after this, stepping doesn't work on some GDB versions.
+Even after this, stepping doesn't work on some GCC, GDB combinations.
 
 **debug_break()** generates an **int3** instruction on i386 / x86-64.
 
@@ -74,18 +74,18 @@ $ gdbdis test/break main
    0x00000000004003de <+14>:    5a	pop    %rdx
    0x00000000004003df <+15>:    c3	retq   
 ```
-Stepping works well after a breakpoint hit.
+Stepping in GDB after a **debug_break()** hit works well.
 Clang / LLVM also has a **__builtin_trap()** that generates **ud2** but further provides [__builtin_debugger()](http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20120507/142621.html) that generates **int3** on i386 / x86-64.
 
-On ARMv7, **debug_break()** generates the undefined instruction **.inst 0xe7f001f0** in ARM mode
-(as opposed to Thumb mode) which triggers SIGTRAP on recent Linux kernels.
-Unfortunately, stepping afterwards doesn't work and requires a workaround like:
+On ARM, **debug_break()** generates the undefined instruction **.inst 0xe7f001f0** in ARM mode and **.inst 0xde01** in Thumb mode which correctly triggers SIGTRAP on Linux. Unfortunately, stepping in GDB after a **debug_break()** hit doesn't work and requires a workaround like:
 ```
-(gdb) tbreak *($pc + 4)
-(gdb) jump   *($pc + 4)
+(gdb) set $l = 2
+(gdb) tbreak *($pc + $l)
+(gdb) jump   *($pc + $l)
+(gdb) # Change $l from 2 to 4 for ARM mode
 ```
-to jump over the four byte instruction.
-The included [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak.h) script adds a **debugbreak-stepi** GDB command that would automate the above.
+to jump over the instruction.
+A new GDB command, **debugbreak-step**, is defined in [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak-gdb.py) to automate the above.
 ```
 $ arm-none-linux-gnueabi-gdb -x debugbreak-gdb.py test/break-c++
 <...>
@@ -93,11 +93,8 @@ $ arm-none-linux-gnueabi-gdb -x debugbreak-gdb.py test/break-c++
 Program received signal SIGTRAP, Trace/breakpoint trap.
 main () at test/break-c++.cc:6
 6		debug_break();
-debugbreak-stepi  define            delete            detach            
-(gdb) debugbreak-stepi 
-Temporary breakpoint 1 at 0x8504: file test/break-c++.cc, line 7.
 
-Temporary breakpoint 1, main () at test/break-c++.cc:7
+(gdb) debugbreak-step
+
 7		std::cout << "hello, world\n";
-```
 ```

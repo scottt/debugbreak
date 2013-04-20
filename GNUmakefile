@@ -12,3 +12,4 @@ clean:
 	$(CC) $(CFLAGS) -nostdlib $< -o $@
 
 test/%: CPPFLAGS +=-I.
+$(PROGRAMS): debugbreak.h
