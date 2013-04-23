@@ -11,5 +11,12 @@ clean:
 %: %.S
 	$(CC) $(CFLAGS) -nostdlib $< -o $@
 
+# Not using builtin rules due to debugbreak.h dependency
+%: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+%: %.cc
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+
 test/%: CPPFLAGS +=-I.
 $(PROGRAMS): debugbreak.h
