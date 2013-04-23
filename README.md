@@ -12,9 +12,10 @@ int main()
 	return 0;
 }
 ```
-this works like the **DebugBreak()** intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
+This works like the **DebugBreak()** intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
+Currently it supports gcc and Clang, works well on ARM, i686, x86-64 and has a fallback code path for other architectures.
 
-Currently it supports gcc and Clang on ARM, i686 and x86-64. Just include the header in your C/C++ code.
+Just include the header in your C/C++ code.
 
 **License**: [2-Clause BSD](https://github.com/scottt/debugbreak/blob/master/COPYING).
 
@@ -99,3 +100,5 @@ main () at test/break-c++.cc:6
 
 7		std::cout << "hello, world\n";
 ```
+
+On other architectures, **debug_break()** generates a call to **raise(SIGTRAP)**.
