@@ -89,7 +89,7 @@ def on_stop_event(e):
             gdb.events.stop.disconnect(on_stop_event)
             l = gdb.find_pc_line(long(gdb.parse_and_eval('$pc'))).line
             gdb.execute('list %d, %d' % (l, l))
-
+            break
 
 def _debugbreak_step():
     global temp_breakpoint_num
