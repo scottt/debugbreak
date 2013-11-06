@@ -52,7 +52,7 @@ This makes it necessary to change GDB's default behavior on **SIGILL** to not te
 ```
 Even after this, continuing execution in GDB doesn't work well on some GCC, GDB combinations.
 
-On ARM, **__builtin_traip()** generates a call to **abort()**.
+On ARM, **__builtin_trap()** generates a call to **abort()**.
 
 **debug_break()** generates an **int3** instruction on i386 / x86-64 ([test/break.c](https://github.com/scottt/debugbreak/blob/master/test/break.c)):
 ```C
