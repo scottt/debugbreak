@@ -27,6 +27,12 @@
 #ifndef DEBUG_BREAK_H
 #define DEBUG_BREAK_H
 
+#ifdef _MSC_VER
+
+#define debug_break __debugbreak
+
+#else
+
 #include <signal.h>
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -108,6 +114,8 @@ static void __inline__ debug_break(void)
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif
