@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Scott Tsai
+/* Copyright (c) 2011-2015, Scott Tsai
  * 
  * All rights reserved.
  * 
@@ -34,8 +34,6 @@
 #else
 
 #include <signal.h>
-#include <unistd.h>
-#include <sys/syscall.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,6 +90,15 @@ static void __inline__ trap_instruction(void)
 	__asm__ volatile(".inst 0xe7f001f0");
 	/* Has same known problem and workaround
 	 * as Thumb mode */
+}
+#elif defined(__aarch64__)
+enum { HAVE_TRAP_INSTRUCTION = 1, };
+__attribute__((gnu_inline, always_inline))
+static void __inline__ trap_instruction(void)
+{
+	/* See 'aarch64-tdep.c' in GDB source,
+	 * 'aarch64_default_breakpoint' */
+	__asm__ volatile(".inst 0xd4200000");
 }
 #else
 enum { HAVE_TRAP_INSTRUCTION = 0, };

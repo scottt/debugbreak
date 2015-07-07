@@ -18,5 +18,6 @@ clean:
 %: %.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
-test/%: CPPFLAGS +=-I.
+test/%: CFLAGS +=-I.
+test/%: CXXFLAGS +=-I.
 $(PROGRAMS): debugbreak.h

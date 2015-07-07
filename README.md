@@ -13,7 +13,7 @@ int main()
 }
 ```
 This works like the **DebugBreak()** intrinsic provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
-Currently it supports gcc and Clang, works well on ARM, i686, x86-64 and has a fallback code path for other architectures.
+Currently it supports gcc and Clang, works well on ARM, AArch64, i686, x86-64 and has a fallback code path for other architectures.
 
 Just include the header in your C/C++ code.
 
