@@ -101,4 +101,6 @@ main () at test/break-c++.cc:6
 7		std::cout << "hello, world\n";
 ```
 
+On AArch64, **debug_break()** generates **.inst 0xd4200000**.
+
 On other architectures, **debug_break()** generates a call to **raise(SIGTRAP)**.

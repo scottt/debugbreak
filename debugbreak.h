@@ -59,7 +59,7 @@ __attribute__((gnu_inline, always_inline))
 static void __inline__ trap_instruction(void)
 {
 	/* See 'arm-linux-tdep.c' in GDB source.
-	 * Both instruction sequences below works. */
+	 * Both instruction sequences below work. */
 #if 1
 	/* 'eabi_linux_thumb_le_breakpoint' */
 	__asm__ volatile(".inst 0xde01");
