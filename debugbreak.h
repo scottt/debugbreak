@@ -115,7 +115,13 @@ static void __inline__ debug_break(void)
 		  * */
 		__builtin_trap();
 	} else {
+		#ifdef _WIN32
+		/* SIGTRAP available only on POSIX-compliant operating systems
+		 * use builtin trap instead */
+		__builtin_trap();
+		#else
 		raise(SIGTRAP);
+		#endif
 	}
 }
 
