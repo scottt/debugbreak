@@ -13,7 +13,8 @@ int main()
 }
 ```
 * Include one header file and insert calls to `debug_break()` in the code where you wish to break into the debugger.
-* Supports GCC and Clang, works well on ARM, AArch64, i686, x86-64 and has a fallback code path for other architectures.
+* Supports GCC, Clang and MSVC.
+* Works well on ARM, AArch64, i686, x86-64 and has a fallback code path for other architectures.
 * Works like the **DebugBreak()** fuction provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
 
 **License**: the very permissive [2-Clause BSD](https://github.com/scottt/debugbreak/blob/master/COPYING).
@@ -28,7 +29,7 @@ The requirements for the **debug_break()** function are:
 * GDB commands like **continue**, **next**, **step**, **stepi** must work after a **debug_break()** hit
 
 Ideally, both GCC and Clang would provide a **__builtin_debugger()** built-in funciton that satisfies the above on all  architectures and operating systems.
-Unfortunately, the compiler support is not there yet.
+Unfortunately, this kind of compiler support is not yet widely available.
 GCC's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizers to think the code follwing can be removed ([test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c)):
 ```C
 #include <stdio.h>
@@ -114,5 +115,6 @@ Behavior on Different Architectures
 | ARM mode, 32-bit   | `.inst 0xe7f001f0`  |
 | Thumb mode, 32-bit | `.inst 0xde01`  |
 | AArch64, ARMv8     | `.inst 0xd4200000` |
-| Other architectures| `raise(SIGTRAP)` |
+| MSVC compiler      | `__debugbreak` |
+| Otherwise          | `raise(SIGTRAP)` |
 
