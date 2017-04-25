@@ -28,8 +28,7 @@ The requirements for the **debug_break()** function are:
 * Trigger a software breakpoint hit when executed (e.g. **SIGTRAP** on Linux)
 * GDB commands like **continue**, **next**, **step**, **stepi** must work after a **debug_break()** hit
 
-Ideally, both GCC and Clang would provide a **__builtin_debugger()** built-in funciton that satisfies the above on all  architectures and operating systems.
-Unfortunately, this kind of compiler support is not yet widely available.
+Ideally, both GCC and Clang would provide a **__builtin_debugger()** built-in funciton that satisfies the above on all  architectures and operating systems. Unfortunately, that is not the case (yet).
 GCC's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizers to think the code follwing can be removed ([test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c)):
 ```C
 #include <stdio.h>
@@ -41,13 +40,14 @@ int main()
 	return 0;
 }
 ```
+compiles to:
 ```
 main
 0x0000000000400390 <+0>:     0f 0b	ud2    
 ```
 Notice how the call to `printf()` is not present in the assembly output. 
 
-Further, **__builtin_trap()** generates an **ud2** instruction which triggers **SIGILL** instead of **SIGTRAP** on i386 / x86-64. This makes it necessary to change GDB's default behavior on **SIGILL** to not terminate the process being debugged:
+Further, on i386 / x86-64 **__builtin_trap()** generates an **ud2** instruction which triggers **SIGILL** instead of **SIGTRAP**. This makes it necessary to change GDB's default behavior on **SIGILL** to not terminate the process being debugged:
 ```
 (gdb) handle SIGILL stop nopass
 ```
@@ -67,6 +67,7 @@ int main()
 	return 0;
 }
 ```
+compiles to:
 ```
 main
 0x00000000004003d0 <+0>:     50	push   %rax
