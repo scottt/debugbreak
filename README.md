@@ -79,7 +79,7 @@ main
 0x00000000004003df <+15>:    c3	retq   
 ```
 which correctly trigges **SIGTRAP** and single-stepping in GDB after a **debug_break()** hit works well.
-Clang / LLVM also has a **__builtin_trap()** that generates **ud2** but further provides [__builtin_debugger()](http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20120507/142621.html) that generates **int3** on i386 / x86-64.
+Clang / LLVM also has a **__builtin_trap()** that generates **ud2** but further provides [__builtin_debugger()](http://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20120507/142621.html) that generates **int3** on i386 / x86-64.
 
 On ARM, **debug_break()** generates **.inst 0xe7f001f0** in ARM mode and **.inst 0xde01** in Thumb mode which correctly triggers *SIGTRAP* on Linux. Unfortunately, stepping in GDB after a **debug_break()** hit doesn't work and requires a workaround like:
 ```
