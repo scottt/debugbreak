@@ -91,6 +91,13 @@ __inline__ static void trap_instruction(void)
 	/* Has same known problem and workaround
 	 * as Thumb mode */
 }
+#elif defined(__aarch64__) && defined(__APPLE__)
+enum { HAVE_TRAP_INSTRUCTION = 1, };
+__attribute__((gnu_inline, always_inline))
+static void __inline__ trap_instruction(void)
+{
+	__builtin_trap();
+}
 #elif defined(__aarch64__)
 enum { HAVE_TRAP_INSTRUCTION = 1, };
 __attribute__((gnu_inline, always_inline))
