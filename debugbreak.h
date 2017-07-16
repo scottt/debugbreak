@@ -39,11 +39,18 @@
 extern "C" {
 #endif
 
+/* Use __builtin_trap() on AArch64 iOS only */
+#if defined(__aarch64__) && defined(__APPLE__)
 enum {
-	/* gcc optimizers consider code after __builtin_trap() dead.
-	 * Making __builtin_trap() unsuitable for breaking into the debugger */
+	DEBUG_BREAK_PREFER_BUILTIN_TRAP_TO_SIGTRAP = 1,
+};
+#else
+enum {
+	/* gcc optimizers consider code after __builtin_trap() dead,
+	 * making __builtin_trap() unsuitable for breaking into the debugger */
 	DEBUG_BREAK_PREFER_BUILTIN_TRAP_TO_SIGTRAP = 0,
 };
+#endif
 
 #if defined(__i386__) || defined(__x86_64__)
 enum { HAVE_TRAP_INSTRUCTION = 1, };
@@ -91,6 +98,8 @@ __inline__ static void trap_instruction(void)
 	/* Has same known problem and workaround
 	 * as Thumb mode */
 }
+#elif defined(__aarch64__) && defined(__APPLE__)
+enum { HAVE_TRAP_INSTRUCTION = 0, }; /* use __builtin_trap() on AArch64 iOS */
 #elif defined(__aarch64__)
 enum { HAVE_TRAP_INSTRUCTION = 1, };
 __attribute__((gnu_inline, always_inline))
