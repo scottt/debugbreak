@@ -87,7 +87,7 @@ def on_stop_event(e):
         if bp.number == temp_breakpoint_num:
             bp.delete()
             gdb.events.stop.disconnect(on_stop_event)
-            l = gdb.find_pc_line(long(gdb.parse_and_eval('$pc'))).line
+            l = gdb.find_pc_line(int(gdb.parse_and_eval('$pc'))).line
             gdb.execute('list %d, %d' % (l, l))
             break
 
