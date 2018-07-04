@@ -17,16 +17,17 @@ Starting program: /home/fedora/debugbreak/test/break
 Program received signal SIGTRAP, Trace/breakpoint trap.
 main () at test/break.c:6
 6		debug_break();
-(gdb) stepi
-0x000000001000048c in trap_instruction () at ./debugbreak.h:131
-131		trap_instruction();
-   0x0000000010000480 <main+0>:	7c 08 02 a6	mflr    r0
-   0x0000000010000484 <main+4>:	f8 01 00 10	std     r0,16(r1)
-   0x0000000010000488 <main+8>:	f8 21 ff 91	stdu    r1,-112(r1)
-=> 0x000000001000048c <main+12>:	7d 82 10 08	twge    r2,r2
 
+Program received signal SIGTRAP, Trace/breakpoint trap.
+main () at test/break.c:6
+6		debug_break();
 (gdb) debugbreak-step
-
-(gdb) debugbreak-continue
+7		printf("hello world\n");
+(gdb) debugbreak-continue 
+hello world
+[Inferior 1 (process 12533) exited normally]
+(gdb)
 
 ```
+
+On ARM and POWER, trying to use `step` or `stepi` in place of `debugbreak-step` in the sesion above wouldn't have worked as execution would be stock on the breakpoint instruction.
