@@ -109,6 +109,23 @@ __inline__ static void trap_instruction(void)
 	 * 'aarch64_default_breakpoint' */
 	__asm__ volatile(".inst 0xd4200000");
 }
+#elif defined(__powerpc__)
+/* PPC 32 or 64-bit, big or little endian */
+enum { HAVE_TRAP_INSTRUCTION = 1, };
+__attribute__((gnu_inline, always_inline))
+__inline__ static void trap_instruction(void)
+{
+	/* See 'rs6000-tdep.c' in GDB source,
+	 * 'rs6000_breakpoint' */
+	__asm__ volatile(".4byte 0x7d821008");
+
+	/* Known problem:
+	 * After a breakpoint hit, can't 'stepi', 'step', or 'continue' in GDB.
+	 * 'step' stuck on the same instruction ("twge r2,r2").
+	 *
+	 * The workaround is the same as ARM Thumb mode: jump over the
+	 * instruction. */
+}
 #else
 enum { HAVE_TRAP_INSTRUCTION = 0, };
 #endif
@@ -140,4 +157,4 @@ __inline__ static void debug_break(void)
 
 #endif
 
-#endif
+#endif /* ifndef DEBUG_BREAK_H */
