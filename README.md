@@ -14,7 +14,7 @@ int main()
 ```
 * Include one header file and insert calls to `debug_break()` in the code where you wish to break into the debugger.
 * Supports GCC, Clang and MSVC.
-* Works well on ARM, AArch64, i686, x86-64 and has a fallback code path for other architectures.
+* Works well on ARM, AArch64, i686, x86-64, POWER and has a fallback code path for other architectures.
 * Works like the **DebugBreak()** fuction provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
 
 **License**: the very permissive [2-Clause BSD](https://github.com/scottt/debugbreak/blob/master/COPYING).
@@ -90,7 +90,7 @@ On ARM, **debug_break()** generates **.inst 0xe7f001f0** in ARM mode and **.inst
 (gdb) # Change $l from 2 to 4 for ARM mode
 ```
 to jump over the instruction.
-A new GDB command, **debugbreak-step**, is defined in [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak-gdb.py) to automate the above.
+A new GDB command, **debugbreak-step**, is defined in [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak-gdb.py) to automate the above. See [HOW-TO-USE-DEBUGBREAK-GDB-PY.md](HOW-TO-USE-DEBUGBREAK-GDB-PY.md) for details.
 ```
 $ arm-none-linux-gnueabi-gdb -x debugbreak-gdb.py test/break-c++
 <...>
@@ -117,6 +117,7 @@ Behavior on Different Architectures
 | ARM mode, 32-bit   | `.inst 0xe7f001f0`  |
 | Thumb mode, 32-bit | `.inst 0xde01`  |
 | AArch64, ARMv8     | `.inst 0xd4200000` |
+| POWER              | `.4byte 0x7d821008` |
 | MSVC compiler      | `__debugbreak` |
 | Otherwise          | `raise(SIGTRAP)` |
 
