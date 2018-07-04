@@ -19,6 +19,8 @@ int main()
 
 **License**: the very permissive [2-Clause BSD](https://github.com/scottt/debugbreak/blob/master/COPYING).
 
+Known Problem: if continuing execution after a debugbreak breakpoint hit doesn't work (e.g. on ARM or POWER), see [HOW-TO-USE-DEBUGBREAK-GDB-PY.md](HOW-TO-USE-DEBUGBREAK-GDB-PY.md) for a workaround.
+
 Implementation Notes
 ================================
 
@@ -28,7 +30,7 @@ The requirements for the **debug_break()** function are:
 * Trigger a software breakpoint hit when executed (e.g. **SIGTRAP** on Linux)
 * GDB commands like **continue**, **next**, **step**, **stepi** must work after a **debug_break()** hit
 
-Ideally, both GCC and Clang would provide a **__builtin_debugtrap()** that satisfies the above on all  architectures and operating systems. Unfortunately, that is not the case (yet).
+Ideally, both GCC and Clang would provide a **__builtin_debugtrap()** that satisfies the above on all architectures and operating systems. Unfortunately, that is not the case (yet).
 GCC's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizers to think the code follwing can be removed ([test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c)):
 ```C
 #include <stdio.h>
@@ -90,7 +92,7 @@ On ARM, **debug_break()** generates **.inst 0xe7f001f0** in ARM mode and **.inst
 (gdb) # Change $l from 2 to 4 for ARM mode
 ```
 to jump over the instruction.
-A new GDB command, **debugbreak-step**, is defined in [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak-gdb.py) to automate the above. See [HOW-TO-USE-DEBUGBREAK-GDB-PY.md](HOW-TO-USE-DEBUGBREAK-GDB-PY.md) for details.
+A new GDB command, **debugbreak-step**, is defined in [debugbreak-gdb.py](https://github.com/scottt/debugbreak/blob/master/debugbreak-gdb.py) to automate the above. See [HOW-TO-USE-DEBUGBREAK-GDB-PY.md](HOW-TO-USE-DEBUGBREAK-GDB-PY.md) for sample usage.
 ```
 $ arm-none-linux-gnueabi-gdb -x debugbreak-gdb.py test/break-c++
 <...>
@@ -119,5 +121,6 @@ Behavior on Different Architectures
 | AArch64, ARMv8     | `.inst 0xd4200000` |
 | POWER              | `.4byte 0x7d821008` |
 | MSVC compiler      | `__debugbreak` |
+| Apple compiler on AArch64     | `__builtin_trap()` |
 | Otherwise          | `raise(SIGTRAP)` |
 
