@@ -53,7 +53,7 @@ Further, on i386 / x86-64 **__builtin_trap()** generates an **ud2** instruction 
 ```
 (gdb) handle SIGILL stop nopass
 ```
-Even after this, continuing execution in GDB doesn't work well on some GCC, GDB combinations.
+Even after this, continuing execution in GDB doesn't work well on some GCC, GDB combinations. See [GCC Bugzilla 84595](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=84595).
 
 On ARM, **__builtin_trap()** generates a call to **abort()**, making it even less suitable.
 
