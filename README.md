@@ -84,7 +84,7 @@ which correctly trigges **SIGTRAP** and single-stepping in GDB after a **debug_b
 
 Clang / LLVM also has a **__builtin_trap()** that generates **ud2** but further provides **__builtin_debugtrap()** that generates **int3** on i386 / x86-64 ([original LLVM intrinsic](http://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20120507/142621.html), [further fixes](https://reviews.llvm.org/rL166300#96cef7d3), [Clang builtin support](https://reviews.llvm.org/rL166298)).
 
-On ARM, **debug_break()** generates **.inst 0xe7f001f0** in ARM mode and **.inst 0xde01** in Thumb mode which correctly triggers *SIGTRAP* on Linux. Unfortunately, stepping in GDB after a **debug_break()** hit doesn't work and requires a workaround like:
+On ARM, **debug_break()** generates **.inst 0xe7f001f0** in ARM mode and **.inst 0xde01** in Thumb mode which correctly triggers **SIGTRAP** on Linux. Unfortunately, stepping in GDB after a **debug_break()** hit doesn't work and requires a workaround like:
 ```
 (gdb) set $l = 2
 (gdb) tbreak *($pc + $l)
@@ -108,7 +108,7 @@ main () at test/break-c++.cc:6
 
 On AArch64, **debug_break()** generates **.inst 0xd4200000**.
 
-On other architectures, **debug_break()** generates a call to **raise(SIGTRAP)**.
+See table below for the behavior of **debug_break()** on other architecturs.
 
 Behavior on Different Architectures
 ----------------
@@ -120,6 +120,7 @@ Behavior on Different Architectures
 | Thumb mode, 32-bit | `.inst 0xde01`  |
 | AArch64, ARMv8     | `.inst 0xd4200000` |
 | POWER              | `.4byte 0x7d821008` |
+| RISC-V             | `.4byte 0x00100073` |
 | MSVC compiler      | `__debugbreak` |
 | Apple compiler on AArch64     | `__builtin_trap()` |
 | Otherwise          | `raise(SIGTRAP)` |
