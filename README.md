@@ -113,6 +113,8 @@ See table below for the behavior of **debug_break()** on other architecturs.
 Behavior on Different Architectures
 ----------------
 
+`__builtin_debugtrap()` is used wherever available, otherwise:
+
 | Architecture       | debug_break() |
 | -------------      | ------------- |
 | x86/x86-64         | `int3`  |
@@ -122,6 +124,4 @@ Behavior on Different Architectures
 | POWER              | `.4byte 0x7d821008` |
 | RISC-V             | `.4byte 0x00100073` |
 | MSVC compiler      | `__debugbreak` |
-| Apple compiler on AArch64     | `__builtin_trap()` |
 | Otherwise          | `raise(SIGTRAP)` |
-

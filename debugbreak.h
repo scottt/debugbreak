@@ -91,8 +91,6 @@ __inline__ static void trap_instruction(void)
 	/* Known problem:
 	 * Same problem and workaround as Thumb mode */
 }
-#elif defined(__aarch64__) && defined(__APPLE__)
-	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_BUILTIN_DEBUGTRAP
 #elif defined(__aarch64__)
 	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_TRAP_INSTRUCTION
 __attribute__((always_inline))
@@ -134,6 +132,12 @@ __inline__ static void trap_instruction(void)
 	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_SIGTRAP
 #endif
 
+#if defined(__has_builtin)
+# if __has_builtin(__builtin_debugtrap)
+#  undef DEBUG_BREAK_IMPL
+#  define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_BUILTIN_DEBUGTRAP
+# endif
+#endif
 
 #ifndef DEBUG_BREAK_IMPL
 #error "debugbreak.h is not supported on this target"
