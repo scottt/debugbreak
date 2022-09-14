@@ -15,7 +15,7 @@ int main()
 * Include one header file and insert calls to `debug_break()` in the code where you wish to break into the debugger.
 * Supports GCC, Clang and MSVC.
 * Works well on ARM, AArch64, i686, x86-64, POWER and has a fallback code path for other architectures.
-* Works like the **DebugBreak()** fuction provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
+* Works like the **DebugBreak()** function provided by [Windows](http://msdn.microsoft.com/en-us/library/ea9yy3ey.aspx) and [QNX](http://www.qnx.com/developers/docs/6.3.0SP3/neutrino/lib_ref/d/debugbreak.html).
 
 **License**: the very permissive [2-Clause BSD](https://github.com/scottt/debugbreak/blob/master/COPYING).
 
@@ -31,7 +31,7 @@ The requirements for the **debug_break()** function are:
 * GDB commands like **continue**, **next**, **step**, **stepi** must work after a **debug_break()** hit
 
 Ideally, both GCC and Clang would provide a **__builtin_debugtrap()** that satisfies the above on all architectures and operating systems. Unfortunately, that is not the case (yet).
-GCC's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizers to think the code follwing can be removed ([test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c)):
+GCC's [__builtin_trap()](http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-g_t_005f_005fbuiltin_005ftrap-3278) causes the optimizers to think the code following can be removed ([test/trap.c](https://github.com/scottt/debugbreak/blob/master/test/trap.c)):
 ```C
 #include <stdio.h>
 
@@ -80,7 +80,7 @@ main
 0x00000000004003de <+14>:    5a	pop    %rdx
 0x00000000004003df <+15>:    c3	retq   
 ```
-which correctly trigges **SIGTRAP** and single-stepping in GDB after a **debug_break()** hit works well.
+which correctly triggers **SIGTRAP** and single-stepping in GDB after a **debug_break()** hit works well.
 
 Clang / LLVM also has a **__builtin_trap()** that generates **ud2** but further provides **__builtin_debugtrap()** that generates **int3** on i386 / x86-64 ([original LLVM intrinsic](http://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20120507/142621.html), [further fixes](https://reviews.llvm.org/rL166300#96cef7d3), [Clang builtin support](https://reviews.llvm.org/rL166298)).
 
@@ -108,7 +108,7 @@ main () at test/break-c++.cc:6
 
 On AArch64, **debug_break()** generates **.inst 0xd4200000**.
 
-See table below for the behavior of **debug_break()** on other architecturs.
+See table below for the behavior of **debug_break()** on other architectures.
 
 Behavior on Different Architectures
 ----------------
