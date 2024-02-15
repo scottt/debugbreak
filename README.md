@@ -106,6 +106,7 @@ main () at test/break-c++.cc:6
 7		std::cout << "hello, world\n";
 ```
 
+On linux arm/aarch64 inlined syscall used
 On AArch64, **debug_break()** generates **.inst 0xd4200000**.
 
 See table below for the behavior of **debug_break()** on other architecturs.
@@ -116,8 +117,10 @@ Behavior on Different Architectures
 | Architecture       | debug_break() |
 | -------------      | ------------- |
 | x86/x86-64         | `int3`  |
+| ARM/Thumb, 32-bit, linux   | `SYS_tgkill(SYS_getpid(),SYS_gettid(),SIGTRAP)`  |
 | ARM mode, 32-bit   | `.inst 0xe7f001f0`  |
 | Thumb mode, 32-bit | `.inst 0xde01`  |
+| AArch64, ARMv8, linux     | `SYS_tgkill(SYS_getpid(),SYS_gettid(),SIGTRAP)` |
 | AArch64, ARMv8     | `.inst 0xd4200000` |
 | POWER              | `.4byte 0x7d821008` |
 | RISC-V             | `.4byte 0x00100073` |
