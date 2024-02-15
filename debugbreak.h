@@ -39,6 +39,7 @@ extern "C" {
 #define DEBUG_BREAK_USE_TRAP_INSTRUCTION 1
 #define DEBUG_BREAK_USE_BULTIN_TRAP      2
 #define DEBUG_BREAK_USE_SIGTRAP          3
+#define DEBUG_BREAK_USE_SYSCALL          4
 
 #if defined(__i386__) || defined(__x86_64__)
 	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_TRAP_INSTRUCTION
@@ -46,6 +47,27 @@ __inline__ static void trap_instruction(void)
 {
 	__asm__ volatile("int $0x03");
 }
+#elif defined(__linux__) && (defined(__arm__) || defined(__thumb__))
+	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_SYSCALL
+#define INLINE_SYS_RAISE(x) do \
+	{ \
+		int raise_sig = (x); \
+		__asm__ volatile (  \
+			"mov r3, r7\n\t" \
+			"mov r7,#178\n\t" /* gettid */ \
+			"svc 0\n\t" \
+			"mov r1, r0\n\t" /* getpid */ \
+			"mov r7,#172\n\t" \
+			"svc 0\n\t" \
+			"mov r7,#268\n\t" /* tgkill */ \
+			"mov r2,%0\n\t" \
+			"svc 0\n\t" \
+			"mov r7, r3\n\t" \
+			: \
+			:"r"(raise_sig) \
+			: "r0", "r1", "r2", "r3", "memory" \
+		); \
+	} while(0)
 #elif defined(__thumb__)
 	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_TRAP_INSTRUCTION
 /* FIXME: handle __THUMB_INTERWORK__ */
@@ -90,6 +112,25 @@ __inline__ static void trap_instruction(void)
 	/* Known problem:
 	 * Same problem and workaround as Thumb mode */
 }
+#elif defined(__aarch64__) && defined(__linux__)
+	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_SYSCALL
+#define INLINE_SYS_RAISE(x) do \
+	{ \
+		unsigned long long raise_sig = (x); \
+		__asm__ volatile ( \
+			"mov x8,#178\n\t" /* gettid */ \
+			"svc 0\n\t" \
+			"mov x1, x0\n\t" \
+			"mov x8,#172\n\t" /* getpid */ \
+			"svc 0\n\t" \
+			"mov x8,#131\n\t" /* tgkill */ \
+			"mov x2,%0\n\t" \
+			"svc 0\n\t" \
+			: \
+			: "r"(raise_sig) \
+			: "x0", "x1", "x2", "x8", "memory", "cc" \
+		); \
+	} while(0)
 #elif defined(__aarch64__) && defined(__APPLE__)
 	#define DEBUG_BREAK_IMPL DEBUG_BREAK_USE_BULTIN_DEBUGTRAP
 #elif defined(__aarch64__)
@@ -136,6 +177,13 @@ __inline__ static void trap_instruction(void)
 
 #ifndef DEBUG_BREAK_IMPL
 #error "debugbreak.h is not supported on this target"
+#elif DEBUG_BREAK_IMPL == DEBUG_BREAK_USE_SYSCALL
+__attribute__((always_inline))
+__inline__ static void debug_break(void)
+{
+	 /* SIGTRAP */
+	INLINE_SYS_RAISE(5);
+}
 #elif DEBUG_BREAK_IMPL == DEBUG_BREAK_USE_TRAP_INSTRUCTION
 __attribute__((always_inline))
 __inline__ static void debug_break(void)
